@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<html lang="en">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>SIMPLE MOTION – Type Loops</title>
-<link href="SIMPLE%20MOTION_files/css2_UByZ.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Anton&family=Bebas+Neue&family=Bungee&family=DM+Serif+Display&family=Playfair+Display:wght@900&family=Rubik+Mono+One&family=Space+Grotesk:wght@700&family=Space+Mono:wght@700&family=Syne:wght@800&family=Unbounded:wght@900&family=Alfa+Slab+One&family=Abril+Fatface&family=Staatliches&family=Dela+Gothic+One&family=Big+Shoulders+Display:wght@900&family=Bricolage+Grotesque:wght@800&family=Fraunces:wght@900&family=Inter:wght@900&family=Rubik:wght@900&family=Bowlby+One&family=Londrina+Solid:wght@900&family=Chivo:wght@900&family=Instrument+Sans:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#ecebe6;--pn:#e1dfd8;--fg:#111214;--mut:#6b6a66;--line:#bdbab0;--acc:#111214;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101113;--pn:#17181b;--fg:#ecebe6;--mut:#8b8a86;--line:#2c2d32;--acc:#ecebe6}}
@@ -38,53 +38,53 @@ input[type=range],input[type=checkbox]{accent-color:var(--fg)}
 .sys{display:flex;gap:8px;align-items:center;padding:3px 0}
 @media(max-width:820px){html,body{height:auto}#app{height:auto;grid-template-columns:1fr}#stage,aside{grid-column:auto;grid-row:auto}#stage{height:60vh}aside{border-right:0;border-top:1px solid var(--line)}}
 </style>
-<script src="SIMPLE%20MOTION_files/mp4-muxer_UByZ.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5/build/mp4-muxer.js"></script>
 </head>
 <body>
 <div id="app">
- <main id="stage"><canvas id="cv" aria-label="Type loop" style="width: 898px; height: 505.125px; left: 16px; top: 107.188px;" width="1796" height="1010"></canvas><div id="ro">Stretch   t 1.95 / 4.0 s   seed 7</div><div id="err" role="alert"></div><div id="bar" aria-label="Loop position" style="background: repeating-linear-gradient(90deg,var(--line) 0 1px,transparent 1px 16.666666666666668%);"><div id="fill" style="left: 48.669%;"></div></div></main>
+ <main id="stage"><canvas id="cv" aria-label="Type loop"></canvas><div id="ro"></div><div id="err" role="alert"></div><div id="bar" aria-label="Loop position"><div id="fill"></div></div></main>
  <aside>
   <p class="wm">SIMPLE MOTION</p>
   <div id="tabs"><button data-k="text" aria-pressed="true">Text</button><button data-k="motion" aria-pressed="false">Motion</button><button data-k="color" aria-pressed="false">Colors</button><button data-k="reel" aria-pressed="false">Reel</button><button data-k="export" aria-pressed="false">Export</button></div>
   <section data-k="text">
   <h3>Text (max. 100 characters per line)</h3>
   <textarea id="tx" rows="4" aria-label="Text">MOTION</textarea>
-  <select id="tm" aria-label="Line mode" style="margin-top:6px"><option value="0" selected="selected">Use first line only</option><option value="1">Stack all lines</option><option value="2">One line per setup (reel)</option><option value="3">Repeat all lines as grid (Rows)</option></select>
+  <select id="tm" aria-label="Line mode" style="margin-top:6px"><option value="0">Use first line only</option><option value="1">Stack all lines</option><option value="2">One line per setup (reel)</option><option value="3">Repeat all lines as grid (Rows)</option></select>
   <label class="row"><span>Rows</span><span>grid</span><input type="number" class="nb" id="rp" min="1" max="40" value="6"></label><label class="sys"><input type="checkbox" id="vc">Center text block vertically</label>
-  <h3>Font</h3><select id="fn" aria-label="Font"><option value="0" selected="selected">Archivo Black</option><option value="1">Anton</option><option value="2">Bebas Neue</option><option value="3">Bungee</option><option value="4">Unbounded</option><option value="5">Syne</option><option value="6">Space Grotesk</option><option value="7">Playfair Display</option><option value="8">DM Serif Display</option><option value="9">Rubik Mono One</option><option value="10">Space Mono</option><option value="11">Alfa Slab One</option><option value="12">Abril Fatface</option><option value="13">Staatliches</option><option value="14">Dela Gothic One</option><option value="15">Big Shoulders Display</option><option value="16">Bricolage Grotesque</option><option value="17">Fraunces</option><option value="18">Inter</option><option value="19">Rubik</option><option value="20">Bowlby One</option><option value="21">Londrina Solid</option><option value="22">Chivo</option></select>
+  <h3>Font</h3><select id="fn" aria-label="Font"></select>
   <label class="sys"><input type="checkbox" id="pp">Proportional letters (no stretching)</label>
   </section>
-  <section data-k="motion" hidden="">
-  <h3>System</h3><select id="md" aria-label="System"><option value="0" selected="selected">Stretch</option><option value="1">Slice</option><option value="2">Collapse</option><option value="3">Waves</option><option value="4">Rotate</option><option value="5">Ticker</option><option value="6">Tunnel</option><option value="7">Radial</option><option value="8">Mosaic</option><option value="9">Tracking</option><option value="10">Drop</option><option value="11">Boxes</option><option value="12">Textgrid</option><option value="13">Trackwave</option></select><p id="ds">Column widths and heights jump on the beat.</p>
+  <section data-k="motion" hidden>
+  <h3>System</h3><select id="md" aria-label="System"></select><p id="ds"></p>
   <div class="f" style="margin-top:10px"><input type="number" id="sd" value="7" min="0" max="99999" aria-label="Seed"><label><input type="checkbox" id="sl">Lock seed</label></div>
   <label class="sys"><input type="checkbox" id="ml">Lock system</label>
   <h3>Images (per setup)</h3>
-  <input type="file" id="im" accept="image/*" multiple=""><span id="imc" style="color:var(--mut)"></span>
-  <select id="imm" aria-label="Image mode" style="margin-top:6px"><option value="0" selected="selected">Off</option><option value="1">Fill letters</option><option value="2">Planes in front</option><option value="3">Planes behind</option></select>
-  <select id="fm" aria-label="Fill mode" style="margin-top:6px"><option value="0" selected="selected">Fill: one image across the word</option><option value="1">Fill: image per letter (keeps ratio)</option></select>
+  <input type="file" id="im" accept="image/*" multiple><span id="imc" style="color:var(--mut)"></span>
+  <select id="imm" aria-label="Image mode" style="margin-top:6px"><option value="0">Off</option><option value="1">Fill letters</option><option value="2">Planes in front</option><option value="3">Planes behind</option></select>
+  <select id="fm" aria-label="Fill mode" style="margin-top:6px"><option value="0">Fill: one image across the word</option><option value="1">Fill: image per letter (keeps ratio)</option></select>
   <label class="row"><span>Planes</span><span></span><input type="number" class="nb" id="pc" min="1" max="24" value="4"></label>
   <label class="row"><span>Fade below</span><span>px</span><input type="number" class="nb" id="pf" min="1" value="120"></label>
   <label class="row"><span>Parallax</span><span>px</span><input type="number" class="nb" id="px" min="0" value="0"></label>
   <label class="row"><span>Delay</span><span>loop</span><input type="number" class="nb" id="pd" min="0" step=".01" value=".05"></label>
   <button id="imx" style="margin-top:6px">Remove images</button>
   <button class="big" id="rnd">Randomize</button>
-  <h3>Rhythm</h3><div id="sl2"><label class="row"><span>Beats</span><input type="range" min="2" max="48" step="1" value="6"><input type="number" class="nb" step="1" value="6"></label><label class="row"><span>Loop (s)</span><input type="range" min="1" max="60" step="0.5" value="4"><input type="number" class="nb" step="0.5" value="4.0"></label><label class="row"><span>Intensity</span><input type="range" min="0" max="1" step="0.01" value="0.8"><input type="number" class="nb" step="0.01" value="0.80"></label><label class="row"><span>Slices</span><input type="range" min="3" max="300" step="1" value="14"><input type="number" class="nb" step="1" value="14"></label><label class="row"><span>Offset</span><input type="range" min="0" max="1" step="0.01" value="0.35"><input type="number" class="nb" step="0.01" value="0.35"></label><label class="row"><span>Speed</span><input type="range" min="0.1" max="10" step="0.05" value="1"><input type="number" class="nb" step="0.05" value="1.00"></label><label class="row"><span>Fade (s)</span><input type="range" min="0" max="3" step="0.1" value="0"><input type="number" class="nb" step="0.1" value="0.0"></label><label class="row"><span>Return</span><input type="range" min="0" max="1" step="0.01" value="1"><input type="number" class="nb" step="0.01" value="1.00"></label><label class="row"><span>Margin X (%)</span><input type="range" min="0" max="49" step="1" value="5"><input type="number" class="nb" step="1" value="5"></label><label class="row"><span>Margin Y (%)</span><input type="range" min="0" max="40" step="1" value="10"><input type="number" class="nb" step="1" value="10"></label><label class="row"><span>Height (%)</span><input type="range" min="2" max="100" step="1" value="74"><input type="number" class="nb" step="1" value="74"></label></div>
+  <h3>Rhythm</h3><div id="sl2"></div>
   <h3>Display</h3>
-  <label class="sys"><input type="checkbox" id="gr" checked="checked">Grid</label>
+  <label class="sys"><input type="checkbox" id="gr" checked>Grid</label>
   <label class="sys"><input type="checkbox" id="iv">Invert</label>
   <label class="sys"><input type="checkbox" id="hl">Detail lines (box outlines, floor line, small gaps)</label>
-  <label class="sys"><input type="checkbox" id="sp" checked="checked">Pixel-snap edges (no seams)</label>
+  <label class="sys"><input type="checkbox" id="sp" checked>Pixel-snap edges (no seams)</label>
   <button id="pl">Pause</button>
   </section>
-  <section data-k="color" hidden="">
+  <section data-k="color" hidden>
   <h3>Colors</h3>
   <label class="sys"><input type="checkbox" id="cu">Custom colors</label>
   <label class="row"><span>Count</span><input type="range" id="cn" min="2" max="8" value="2"><input type="number" class="nb" id="cno" min="2" max="8" value="2"></label>
-  <div id="cs"><label class="sys"><input type="color" value="#ecebe6"><span>Background</span></label><label class="sys"><input type="color" value="#111214"><span>Type</span></label></div>
+  <div id="cs"></div>
   <button id="cz">Randomize colors</button><label class="sys"><input type="checkbox" id="cr">Random colors in every reel setup</label>
   <p style="color:var(--mut)">Color 1 = background, color 2 = type. Further colors cycle across the letters.</p>
   </section>
-  <section data-k="reel" hidden="">
+  <section data-k="reel" hidden>
   <h3>Reel</h3>
   <label class="row"><span>Setups</span><input type="range" id="rn" min="2" max="24" value="8"><input type="number" class="nb" id="rno" min="1" max="200" value="8"></label>
   <label class="row"><span>Length (s)</span><input type="range" id="rl" min="4" max="60" value="12"><input type="number" class="nb" id="rlo" min="1" max="600" value="12"></label>
@@ -95,14 +95,14 @@ input[type=range],input[type=checkbox]{accent-color:var(--fg)}
   <label class="sys"><input type="checkbox" id="rf">Keep font</label>
   <label class="sys"><input type="checkbox" id="rm">Play reel and export it</label>
   </section>
-  <section data-k="export" hidden="">
+  <section data-k="export" hidden>
   <h3>Export</h3>
   <label class="row"><span>Duration (s)</span><input type="range" id="du" min="1" max="30" step=".5" value="4"><input type="number" class="nb" id="duo" min=".1" step=".5" value="4"></label>
-  <div class="f"><input type="number" id="ew" min="16" max="7680" step="2" aria-label="Width in px" value="1920"><span>×</span><input type="number" id="eh" min="16" max="7680" step="2" aria-label="Height in px" value="1080"><span>px</span></div>
-  <div class="f"><select id="rs" aria-label="Resolution preset"><option value="0">Preset 1280×720</option><option value="1" selected="selected">Preset 1920×1080</option><option value="2">Preset 1080×1080</option><option value="3">Preset 1080×1350</option><option value="4">Preset 1080×1920</option><option value="5">Preset 3840×2160</option></select></div>
+  <div class="f"><input type="number" id="ew" min="16" max="7680" step="2" aria-label="Width in px"><span>×</span><input type="number" id="eh" min="16" max="7680" step="2" aria-label="Height in px"><span>px</span></div>
+  <div class="f"><select id="rs" aria-label="Resolution preset"></select></div>
   <label class="row"><span>Frame rate</span><span>fps</span><input type="number" class="nb" id="fps" min="1" max="120" value="30"></label>
   <label class="row"><span>Bitrate</span><span>Mbps</span><input type="number" class="nb" id="br" min="1" value="40"></label>
-  <div class="f"><select id="ef" aria-label="Export format"><option value="mp4" selected="selected">MP4 video</option><option value="png">PNG sequence (.zip)</option><option value="jpg">JPG sequence (.zip)</option></select></div>
+  <div class="f"><select id="ef" aria-label="Export format"><option value="mp4">MP4 video</option><option value="png">PNG sequence (.zip)</option><option value="jpg">JPG sequence (.zip)</option></select></div>
   <button class="big" id="ex" style="margin-top:4px">Export</button>
   <p id="xs" style="color:var(--mut);min-height:36px"></p>
   </section>
@@ -461,6 +461,5 @@ buildUI();sync();if(!S.play){S.t=1.2;$('#pl').textContent='Play'}rebuild();
 loadF();
 requestAnimationFrame(frame);
 </script>
-
-
-</body></html>
+</body>
+</html>
