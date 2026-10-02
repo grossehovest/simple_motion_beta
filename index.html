@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SIMPLE MOTION – Type Loops</title>
+<link href="SIMPLE%20MOTION_files/css2_UByZ.css" rel="stylesheet">
+<style>
+:root{--bg:#ecebe6;--pn:#e1dfd8;--fg:#111214;--mut:#6b6a66;--line:#bdbab0;--acc:#111214;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101113;--pn:#17181b;--fg:#ecebe6;--mut:#8b8a86;--line:#2c2d32;--acc:#ecebe6}}
+:root[data-theme="dark"]{--bg:#101113;--pn:#17181b;--fg:#ecebe6;--mut:#8b8a86;--line:#2c2d32;--acc:#ecebe6}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font:13px/1.4 'Instrument Sans',system-ui,sans-serif}
+*{box-sizing:border-box}
+#app{display:grid;height:100%;grid-template-columns:470px minmax(0,1fr)}
+#stage{position:relative;min-width:0;min-height:0;grid-column:2;grid-row:1}
+canvas{position:absolute;display:block;box-shadow:0 0 0 1px var(--line)}
+#ro{position:absolute;left:16px;top:12px;color:var(--mut);font-variant-numeric:tabular-nums}
+#bar{position:absolute;left:5%;right:5%;bottom:16px;height:14px;border:1px solid var(--line);cursor:ew-resize;touch-action:none}
+#fill{position:absolute;top:-1px;bottom:-1px;width:2px;background:var(--fg)}
+#err{display:none;position:absolute;left:14px;right:14px;top:40px;padding:10px;background:var(--pn);border:1px solid var(--fg);white-space:pre-wrap}
+aside{grid-column:1;grid-row:1;background:var(--pn);border-right:1px solid var(--line);padding:16px;overflow:auto}
+.wm{font:15px 'Archivo Black',Impact,sans-serif;margin:0 0 16px}
+h3{font-size:12px;font-weight:600;margin:18px 0 8px;color:var(--mut)}
+button,input,select{font:inherit;color:inherit}
+select{width:100%;background:var(--bg);border:1px solid var(--line);padding:7px 8px}
+#ds{color:var(--mut);margin:6px 0 0;min-height:38px}
+button{background:transparent;border:1px solid var(--line);padding:6px 9px;cursor:pointer;margin:0 4px 4px 0}
+button:hover{border-color:var(--fg)}
+button[aria-pressed=true]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+button.big{width:100%;margin:12px 0 0;padding:11px;background:var(--fg);color:var(--bg);font-weight:600;border-color:var(--fg)}
+.nb{width:64px!important;text-align:right;padding:3px 4px!important}textarea{resize:vertical;font:inherit}section[hidden]{display:none}#tabs{display:flex;flex-wrap:wrap}input[type=color]{width:34px;height:26px;padding:0;border:1px solid var(--line);background:none}:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+textarea,input[type=text],input[type=number]{width:100%;background:var(--bg);border:1px solid var(--line);padding:6px 8px}
+input[type=range],input[type=checkbox]{accent-color:var(--fg)}
+.f{display:flex;gap:8px;align-items:center;margin-bottom:8px}.f input[type=number]{width:90px}
+.row{display:grid;grid-template-columns:84px 1fr 64px;gap:6px;align-items:center;padding:2px 0}
+.row output{text-align:right;font-variant-numeric:tabular-nums;color:var(--mut)}
+.sys{display:flex;gap:8px;align-items:center;padding:3px 0}
+@media(max-width:820px){html,body{height:auto}#app{height:auto;grid-template-columns:1fr}#stage,aside{grid-column:auto;grid-row:auto}#stage{height:60vh}aside{border-right:0;border-top:1px solid var(--line)}}
+</style>
+<script src="SIMPLE%20MOTION_files/mp4-muxer_UByZ.js"></script>
+</head>
+<body>
+<div id="app">
+ <main id="stage"><canvas id="cv" aria-label="Type loop" style="width: 898px; height: 505.125px; left: 16px; top: 107.188px;" width="1796" height="1010"></canvas><div id="ro">Stretch   t 1.95 / 4.0 s   seed 7</div><div id="err" role="alert"></div><div id="bar" aria-label="Loop position" style="background: repeating-linear-gradient(90deg,var(--line) 0 1px,transparent 1px 16.666666666666668%);"><div id="fill" style="left: 48.669%;"></div></div></main>
+ <aside>
+  <p class="wm">SIMPLE MOTION</p>
+  <div id="tabs"><button data-k="text" aria-pressed="true">Text</button><button data-k="motion" aria-pressed="false">Motion</button><button data-k="color" aria-pressed="false">Colors</button><button data-k="reel" aria-pressed="false">Reel</button><button data-k="export" aria-pressed="false">Export</button></div>
+  <section data-k="text">
+  <h3>Text (max. 100 characters per line)</h3>
+  <textarea id="tx" rows="4" aria-label="Text">MOTION</textarea>
+  <select id="tm" aria-label="Line mode" style="margin-top:6px"><option value="0" selected="selected">Use first line only</option><option value="1">Stack all lines</option><option value="2">One line per setup (reel)</option><option value="3">Repeat all lines as grid (Rows)</option></select>
+  <label class="row"><span>Rows</span><span>grid</span><input type="number" class="nb" id="rp" min="1" max="40" value="6"></label><label class="sys"><input type="checkbox" id="vc">Center text block vertically</label>
+  <h3>Font</h3><select id="fn" aria-label="Font"><option value="0" selected="selected">Archivo Black</option><option value="1">Anton</option><option value="2">Bebas Neue</option><option value="3">Bungee</option><option value="4">Unbounded</option><option value="5">Syne</option><option value="6">Space Grotesk</option><option value="7">Playfair Display</option><option value="8">DM Serif Display</option><option value="9">Rubik Mono One</option><option value="10">Space Mono</option><option value="11">Alfa Slab One</option><option value="12">Abril Fatface</option><option value="13">Staatliches</option><option value="14">Dela Gothic One</option><option value="15">Big Shoulders Display</option><option value="16">Bricolage Grotesque</option><option value="17">Fraunces</option><option value="18">Inter</option><option value="19">Rubik</option><option value="20">Bowlby One</option><option value="21">Londrina Solid</option><option value="22">Chivo</option></select>
+  <label class="sys"><input type="checkbox" id="pp">Proportional letters (no stretching)</label>
+  </section>
+  <section data-k="motion" hidden="">
+  <h3>System</h3><select id="md" aria-label="System"><option value="0" selected="selected">Stretch</option><option value="1">Slice</option><option value="2">Collapse</option><option value="3">Waves</option><option value="4">Rotate</option><option value="5">Ticker</option><option value="6">Tunnel</option><option value="7">Radial</option><option value="8">Mosaic</option><option value="9">Tracking</option><option value="10">Drop</option><option value="11">Boxes</option><option value="12">Textgrid</option><option value="13">Trackwave</option></select><p id="ds">Column widths and heights jump on the beat.</p>
+  <div class="f" style="margin-top:10px"><input type="number" id="sd" value="7" min="0" max="99999" aria-label="Seed"><label><input type="checkbox" id="sl">Lock seed</label></div>
+  <label class="sys"><input type="checkbox" id="ml">Lock system</label>
+  <h3>Images (per setup)</h3>
+  <input type="file" id="im" accept="image/*" multiple=""><span id="imc" style="color:var(--mut)"></span>
+  <select id="imm" aria-label="Image mode" style="margin-top:6px"><option value="0" selected="selected">Off</option><option value="1">Fill letters</option><option value="2">Planes in front</option><option value="3">Planes behind</option></select>
+  <select id="fm" aria-label="Fill mode" style="margin-top:6px"><option value="0" selected="selected">Fill: one image across the word</option><option value="1">Fill: image per letter (keeps ratio)</option></select>
+  <label class="row"><span>Planes</span><span></span><input type="number" class="nb" id="pc" min="1" max="24" value="4"></label>
+  <label class="row"><span>Fade below</span><span>px</span><input type="number" class="nb" id="pf" min="1" value="120"></label>
+  <label class="row"><span>Parallax</span><span>px</span><input type="number" class="nb" id="px" min="0" value="0"></label>
+  <label class="row"><span>Delay</span><span>loop</span><input type="number" class="nb" id="pd" min="0" step=".01" value=".05"></label>
+  <button id="imx" style="margin-top:6px">Remove images</button>
+  <button class="big" id="rnd">Randomize</button>
+  <h3>Rhythm</h3><div id="sl2"><label class="row"><span>Beats</span><input type="range" min="2" max="48" step="1" value="6"><input type="number" class="nb" step="1" value="6"></label><label class="row"><span>Loop (s)</span><input type="range" min="1" max="60" step="0.5" value="4"><input type="number" class="nb" step="0.5" value="4.0"></label><label class="row"><span>Intensity</span><input type="range" min="0" max="1" step="0.01" value="0.8"><input type="number" class="nb" step="0.01" value="0.80"></label><label class="row"><span>Slices</span><input type="range" min="3" max="300" step="1" value="14"><input type="number" class="nb" step="1" value="14"></label><label class="row"><span>Offset</span><input type="range" min="0" max="1" step="0.01" value="0.35"><input type="number" class="nb" step="0.01" value="0.35"></label><label class="row"><span>Speed</span><input type="range" min="0.1" max="10" step="0.05" value="1"><input type="number" class="nb" step="0.05" value="1.00"></label><label class="row"><span>Fade (s)</span><input type="range" min="0" max="3" step="0.1" value="0"><input type="number" class="nb" step="0.1" value="0.0"></label><label class="row"><span>Return</span><input type="range" min="0" max="1" step="0.01" value="1"><input type="number" class="nb" step="0.01" value="1.00"></label><label class="row"><span>Margin X (%)</span><input type="range" min="0" max="49" step="1" value="5"><input type="number" class="nb" step="1" value="5"></label><label class="row"><span>Margin Y (%)</span><input type="range" min="0" max="40" step="1" value="10"><input type="number" class="nb" step="1" value="10"></label><label class="row"><span>Height (%)</span><input type="range" min="2" max="100" step="1" value="74"><input type="number" class="nb" step="1" value="74"></label></div>
+  <h3>Display</h3>
+  <label class="sys"><input type="checkbox" id="gr" checked="checked">Grid</label>
+  <label class="sys"><input type="checkbox" id="iv">Invert</label>
+  <label class="sys"><input type="checkbox" id="hl">Detail lines (box outlines, floor line, small gaps)</label>
+  <label class="sys"><input type="checkbox" id="sp" checked="checked">Pixel-snap edges (no seams)</label>
+  <button id="pl">Pause</button>
+  </section>
+  <section data-k="color" hidden="">
+  <h3>Colors</h3>
+  <label class="sys"><input type="checkbox" id="cu">Custom colors</label>
+  <label class="row"><span>Count</span><input type="range" id="cn" min="2" max="8" value="2"><input type="number" class="nb" id="cno" min="2" max="8" value="2"></label>
+  <div id="cs"><label class="sys"><input type="color" value="#ecebe6"><span>Background</span></label><label class="sys"><input type="color" value="#111214"><span>Type</span></label></div>
+  <button id="cz">Randomize colors</button><label class="sys"><input type="checkbox" id="cr">Random colors in every reel setup</label>
+  <p style="color:var(--mut)">Color 1 = background, color 2 = type. Further colors cycle across the letters.</p>
+  </section>
+  <section data-k="reel" hidden="">
+  <h3>Reel</h3>
+  <label class="row"><span>Setups</span><input type="range" id="rn" min="2" max="24" value="8"><input type="number" class="nb" id="rno" min="1" max="200" value="8"></label>
+  <label class="row"><span>Length (s)</span><input type="range" id="rl" min="4" max="60" value="12"><input type="number" class="nb" id="rlo" min="1" max="600" value="12"></label>
+  <button class="big" id="rg" style="margin:6px 0">Create reel</button>
+  <div id="chips"></div>
+  <label class="row"><span>Setup (s)</span><span>length</span><input type="number" class="nb" id="sdu" min=".1" step=".1" value="1"></label>
+  <button id="rr">Re-roll selected</button>
+  <label class="sys"><input type="checkbox" id="rf">Keep font</label>
+  <label class="sys"><input type="checkbox" id="rm">Play reel and export it</label>
+  </section>
+  <section data-k="export" hidden="">
+  <h3>Export</h3>
+  <label class="row"><span>Duration (s)</span><input type="range" id="du" min="1" max="30" step=".5" value="4"><input type="number" class="nb" id="duo" min=".1" step=".5" value="4"></label>
+  <div class="f"><input type="number" id="ew" min="16" max="7680" step="2" aria-label="Width in px" value="1920"><span>×</span><input type="number" id="eh" min="16" max="7680" step="2" aria-label="Height in px" value="1080"><span>px</span></div>
+  <div class="f"><select id="rs" aria-label="Resolution preset"><option value="0">Preset 1280×720</option><option value="1" selected="selected">Preset 1920×1080</option><option value="2">Preset 1080×1080</option><option value="3">Preset 1080×1350</option><option value="4">Preset 1080×1920</option><option value="5">Preset 3840×2160</option></select></div>
+  <label class="row"><span>Frame rate</span><span>fps</span><input type="number" class="nb" id="fps" min="1" max="120" value="30"></label>
+  <label class="row"><span>Bitrate</span><span>Mbps</span><input type="number" class="nb" id="br" min="1" value="40"></label>
+  <div class="f"><select id="ef" aria-label="Export format"><option value="mp4" selected="selected">MP4 video</option><option value="png">PNG sequence (.zip)</option><option value="jpg">JPG sequence (.zip)</option></select></div>
+  <button class="big" id="ex" style="margin-top:4px">Export</button>
+  <p id="xs" style="color:var(--mut);min-height:36px"></p>
+  </section>
+ </aside>
+</div>
+<script>
+"use strict";
+const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.min(b,Math.max(a,v)),lp=(a,b,t)=>a+(b-a)*t;
+// harter, rhythmischer Ease (Expo in-out) – Bewegung passiert schnell, dann Stillstand
+const E=p=>p<=0?0:p>=1?1:p<.5?Math.pow(2,20*p-10)/2:(2-Math.pow(2,-20*p+10))/2;
+const rng=s=>{let a=s>>>0;return()=>{a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}};
+// zustandsloser Hash: Zufallswert = Funktion von (seed,a,b,c) -> Loop ist exakt reproduzierbar
+const S={t:0,play:!matchMedia('(prefers-reduced-motion: reduce)').matches,seed:7,mode:0,lines:['MOTION'],tm:0,line:0,im:0,cs:0};
+const H=(a,b,c)=>{let x=(S.seed*374761393+a*668265263+b*2147483647+c*1274126177)|0;x=Math.imul(x^x>>>13,1274126177);x=Math.imul(x^x>>>16,2246822519);return((x^x>>>15)>>>0)/4294967296};
+const DEF=[['beats','Beats',2,48,1,6],['loop','Loop (s)',1,60,.5,4],['amp','Intensity',0,1,.01,.8],['slices','Slices',3,300,1,14],['stagger','Offset',0,1,.01,.35],['speed','Speed',.1,10,.05,1],['fade','Fade (s)',0,3,.1,0],['ret','Return',0,1,.01,1],['mx','Margin X (%)',0,49,1,5],['my','Margin Y (%)',0,40,1,10],['ah','Height (%)',2,100,1,74]];
+const P={},inp={},RE={clips:[],starts:[],sel:0,on:false,cur:-1,len:12,rt:0};
+const MODES=['Stretch','Slice','Collapse','Waves','Rotate','Ticker','Tunnel','Radial','Mosaic','Tracking','Drop','Boxes','Textgrid','Trackwave'];
+const DESC=['Column widths and heights jump on the beat.','Horizontal strips shift sideways (Slices = strips).','Letters collapse in steps and grow back.','Vertical strips run through the word as a sine wave.','Each cell rotates in quarter turns on the beat.','The word runs through counter-moving bands (Slices = bands).','The word zooms into itself, colors alternate per layer.','Letters orbit as a ring, offset on the beat.','The word breaks into tiles that swap places.','Letter spacing opens and closes (negative and wide tracking).','Letters fall, bounce and return (Intensity = tilt).','The word in boxes that split and shift on the beat (Intensity = depth).','Grid of small words; rows slide against each other and lock in.','Every letter opens and closes its own spacing, staggered by Offset.'];
+const FONTS=[['Archivo Black','400'],['Anton','400'],['Bebas Neue','400'],['Bungee','400'],['Unbounded','900'],['Syne','800'],['Space Grotesk','700'],['Playfair Display','900'],['DM Serif Display','400'],['Rubik Mono One','400'],['Space Mono','700'],['Alfa Slab One','400'],['Abril Fatface','400'],['Staatliches','400'],['Dela Gothic One','400'],['Big Shoulders Display','900'],['Bricolage Grotesque','800'],['Fraunces','900'],['Inter','900'],['Rubik','900'],['Bowlby One','400'],['Londrina Solid','900'],['Chivo','900']];
+const HL=()=>$('#hl').checked,IO=()=>true;
+const IMV=()=>({im:S.im,pc:+$('#pc').value,pf:+$('#pf').value,px:+$('#px').value||0,pd:+$('#pd').value||0,fm:+$('#fm').value});
+const setIMV=c=>{S.im=c.im|0;$('#imm').value=S.im;$('#pc').value=c.pc??4;$('#pf').value=c.pf??120;$('#px').value=c.px??0;$('#pd').value=c.pd??.05;$('#fm').value=c.fm??0};
+const link=(a,b,cb)=>{a.oninput=()=>{b.value=a.value;cb&&cb()};b.oninput=()=>{if(b.value!==''&&!isNaN(b.value)){a.value=b.value;cb&&cb()}}};
+const sm=(a,b,x)=>{const t=cl((x-a)/(b-a),0,1);return t*t*(3-2*t)};
+const fm=(v,st)=>(+v).toFixed((String(st).split('.')[1]||'').length);
+const cv=$('#cv'),ctx=cv.getContext('2d');
+// Pixel snap: destination rects of drawImage/clip are rounded to whole device pixels -> no seams between strips
+const _di=ctx.drawImage.bind(ctx),_rc=ctx.rect.bind(ctx);
+const snapR=(x,y,w,h)=>{const t=ctx.getTransform();if(!$('#sp').checked||t.b||t.c||!t.a||!t.d)return null;const X0=Math.round(t.a*x+t.e),X1=Math.round(t.a*(x+w)+t.e),Y0=Math.round(t.d*y+t.f),Y1=Math.round(t.d*(y+h)+t.f);return[(X0-t.e)/t.a,(Y0-t.f)/t.d,(X1-X0)/t.a,(Y1-Y0)/t.d]};
+ctx.drawImage=(im,...a)=>{const o=a.length===8?4:0,r=a.length>=4?snapR(a[o],a[o+1],a[o+2],a[o+3]):null;if(r){a.splice(o,4,...r);if(o===4){const x0=Math.round(a[0]),y0=Math.round(a[1]),x1=Math.round(a[0]+a[2]),y1=Math.round(a[1]+a[3]);a[0]=x0;a[1]=y0;a[2]=Math.max(1,x1-x0);a[3]=Math.max(1,y1-y0)}}return _di(im,...a)};
+ctx.rect=(x,y,w,h)=>{const r=snapR(x,y,w,h);return r?_rc(...r):_rc(x,y,w,h)};
+let IMGS=[],LINES=[],CH=[],PRX=null,OV=.6,W=1,H_=1,DPR=1,L={},GL=[],GI=[],WC=null,WI=null,F=0,TH={bg:'#000',fg:'#fff'};
+function err(e){const d=$('#err');d.style.display='block';d.textContent='Error: '+(e&&e.message||e);console.error(e)}
+function readTheme(){const cs=getComputedStyle(document.documentElement);const n={bg:cs.getPropertyValue('--bg').trim(),fg:cs.getPropertyValue('--fg').trim()};
+ const ch=n.bg!==TH.bg||n.fg!==TH.fg;TH=n;return ch}
+const PL={on:false,n:2,c:['#ecebe6','#111214','#ff3b30','#2f6bff','#ffd400','#1fb35a','#ff8a00','#9b5cff']};
+let CK='',CV=[];
+const cols=()=>{const k=[PL.on,PL.n,PL.c.join(),S.cs,$('#iv').checked,TH.bg,TH.fg].join('|');if(k===CK)return CV;let a=PL.on?PL.c.slice(0,PL.n):[TH.bg,TH.fg];if(PL.on&&S.cs){const R=rng(S.cs);for(let i=a.length-1;i>0;i--){const j=R()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}}if($('#iv').checked)[a[0],a[1]]=[a[1],a[0]];CK=k;return CV=a};
+const paper=()=>cols()[0],ink=()=>cols()[1],letterInk=i=>{const a=cols();return a.length>2?a[1+i%(a.length-1)]:a[1]};
+// Jeder Buchstabe wird einmal als Glyphen-Bitmap gerendert und füllt seine Rasterzelle vollständig aus
+let XO=null; // Export-Auflösung [w,h] oder null
+const lineList=()=>S.tm===1?S.lines:S.tm===3?Array.from({length:cl(+$('#rp').value|0,1,40)},(_,i)=>S.lines[i%S.lines.length]):[S.lines[S.tm===2?S.line%S.lines.length:0]];
+function fitStage(){const st=$('#stage').getBoundingClientRect(),r=(+$('#ew').value||1920)/(+$('#eh').value||1080),aw=Math.max(40,st.width-32),ah=Math.max(40,st.height-84),w=Math.min(aw,ah*r),h=w/r;cv.style.width=w+'px';cv.style.height=h+'px';cv.style.left=(st.width-w)/2+'px';cv.style.top=(40+(ah-h)/2)+'px'}
+function rebuild(){
+ try{
+  if(!XO)fitStage();
+  const r=cv.getBoundingClientRect();DPR=XO?1:Math.min(devicePixelRatio||1,2);W=XO?XO[0]:Math.max(2,r.width|0);H_=XO?XO[1]:Math.max(2,r.height|0);cv.width=W*DPR;cv.height=H_*DPR;readTheme();buildGlyphs();
+ }catch(e){err(e)}
+}
+function buildGlyphs(){
+ try{
+  const T=Math.PI*2,uu=(S.t/P.loop)%1,sc=W/Math.max(1,+$('#ew').value||W),amp=(+$('#px').value||0)*sc,dl=+$('#pd').value||0,fmv=+$('#fm').value,pp=$('#pp').checked,fnt=`${FONTS[F][1]} 200px '${FONTS[F][0]}',Impact,sans-serif`;
+  const IMG=S.im===1?IMGS[0]:null,ls=lineList(),nl=ls.length,gap=nl>1?H_*.02:0,bh=(H_*P.ah/100-gap*(nl-1))/nl,vc=$('#vc').checked;
+  const o0=document.createElement('canvas').getContext('2d');o0.font=fnt;const rm=o0.measureText('HÅg'),RA=rm.actualBoundingBoxAscent,RD=rm.actualBoundingBoxDescent;
+  LINES=ls.map((tx,li)=>{
+   const chars=[...tx.toUpperCase()],n=Math.max(1,chars.length),Lx={n,x0:W*P.mx/100,w:W*(1-2*P.mx/100),y0:(vc?(H_-(bh*nl+gap*(nl-1)))/2:H_*P.my/100)+li*(bh+gap),h:bh,i:li};
+   const gw=Math.ceil(Lx.w/n*DPR),gh=Math.ceil(bh*DPR);
+   const mm=chars.map(ch=>{if(!ch.trim())return null;const m=o0.measureText(ch);return[m.actualBoundingBoxAscent,m.actualBoundingBoxDescent,m.actualBoundingBoxLeft,m.actualBoundingBoxRight]});
+   const mw=Math.min(1,...mm.filter(Boolean).map(q=>.92/Math.max(1,q[2]+q[3]))),KP=Math.min(gh/Math.max(1,RA+RD),gw*mw);
+   const mk=(col,fi)=>chars.map((ch,i)=>{if(!mm[i])return null;const[a,d,l,rr]=mm[i],c=document.createElement('canvas');c.width=gw;c.height=gh;const o=c.getContext('2d');o.font=fnt;
+    if(pp)o.setTransform(KP,0,0,KP,(gw-(l+rr)*KP)/2+l*KP,(gh-(RA+RD)*KP)/2+RA*KP);else{const pad=gw*.04,sx=(gw-2*pad)/Math.max(1,l+rr),sy=gh/Math.max(1,a+d);o.setTransform(sx,0,0,sy,pad+l*sx,a*sy)}
+    o.fillStyle=col(i);o.fillText(ch,0,0);
+    if(fi&&IMG){o.setTransform(1,0,0,1,0,0);o.globalCompositeOperation='source-in';const W0=fmv?gw:gw*n,k=Math.max(W0/IMG.width,gh/IMG.height)*(1+2*amp*DPR/Math.max(1,Math.min(W0,gh))),ph=T*(uu-i*dl);o.drawImage(IMG,(W0-IMG.width*k)/2-(fmv?0:i*gw)+amp*DPR*Math.sin(ph),(gh-IMG.height*k)/2+amp*DPR*.5*Math.cos(ph),IMG.width*k,IMG.height*k)}
+    return c});
+   const GL=mk(letterInk,true),GI=mk(paper,false);
+   const wb=(gs,bg)=>{const c=document.createElement('canvas');c.width=gw*n;c.height=gh;const o=c.getContext('2d');o.fillStyle=bg;o.fillRect(0,0,c.width,c.height);gs.forEach((g,i)=>g&&o.drawImage(g,i*gw,0));return c};
+   return{L:Lx,GL,GI,WC:wb(GL,paper()),WI:wb(GI,ink()),CH:chars,PRX:{mm,RA,RD,mw,pp}}});
+ }catch(e){err(e)}
+}
+// vector glyph (stays sharp at any zoom, used by Tunnel)
+function glyphV(i,x,y,cw,hh,col){const Q=PRX,[a,d,l,rr]=Q.mm[i];let tx,ty,sx,sy;if(Q.pp){const k=Math.min(hh/(Q.RA+Q.RD),cw*Q.mw);sx=sy=k;tx=(cw-(l+rr)*k)/2+l*k;ty=(hh-(Q.RA+Q.RD)*k)/2+Q.RA*k}else{const pad=cw*.04;sx=(cw-2*pad)/Math.max(1,l+rr);sy=hh/Math.max(1,a+d);tx=pad+l*sx;ty=a*sy}
+ ctx.save();ctx.translate(x,y);ctx.transform(sx,0,0,sy,tx,ty);ctx.font=`${FONTS[F][1]} 200px '${FONTS[F][0]}',Impact,sans-serif`;ctx.fillStyle=col;ctx.fillText(CH[i],0,0);ctx.restore()}
+function drawGrid(){
+ if(!$('#gr').checked)return;
+ ctx.strokeStyle=ink();ctx.globalAlpha=.3;ctx.lineWidth=1;ctx.beginPath();
+ for(let i=0;i<=L.n;i++){const x=Math.round(L.x0+L.w/L.n*i)+.5;ctx.moveTo(x,L.y0-14);ctx.lineTo(x,L.y0+L.h+14)}
+ ctx.moveTo(L.x0-14,L.y0);ctx.lineTo(L.x0+L.w+14,L.y0);ctx.moveTo(L.x0-14,L.y0+L.h);ctx.lineTo(L.x0+L.w+14,L.y0+L.h);ctx.stroke();ctx.globalAlpha=1;
+}
+// Lokale Taktposition pro Buchstabe (Versatz = zeitliche Verschiebung, Loop schließt nahtlos)
+function beatPos(i,u){const B=P.beats,b=((u*B-i*P.stagger*.6)%B+B)%B;return[Math.floor(b)%B,(Math.floor(b)+1)%B,b-Math.floor(b),b/B]}
+function drawX(m,u){
+ if(!WC)return;
+ const {n,x0,w,y0,h}=L,A=P.amp,B=P.beats,cw=w/n,T=Math.PI*2,b0=u*B,k0=Math.floor(b0)%B,p0=b0-Math.floor(b0),s=(Math.floor(b0)+E(p0))/B;
+ const sS=i=>{const q=beatPos(i,u);return(Math.floor(q[3]*B)+E(q[2]))/B}; // gestufter Fortschritt 0..1 pro Buchstabe
+ if(m===3){ // WELLEN: vertikale Streifen, Sinus-Versatz läuft genau einmal pro Loop durch
+  const sn=P.slices*2;
+  for(let i=0;i<n;i++){const g=GL[i];if(!g)continue;const cx=x0+cw*i,sw=g.width/sn;
+   ctx.save();ctx.beginPath();ctx.rect(cx,y0,cw,h);ctx.clip();
+   for(let j=0;j<sn;j++){const ph=(i*sn+j)/(n*sn)*T*Math.max(1,B/2|0),off=Math.sin(ph-s*T)*A*h*.5*Math.sin(Math.PI*((b0/2)%1)),o=((off%h)+h)%h,dx=cx+cw/sn*j;
+    ctx.drawImage(g,sw*j,0,sw,g.height,dx,y0+o,cw/sn+OV,h);ctx.drawImage(g,sw*j,0,sw,g.height,dx,y0+o-h,cw/sn+OV,h)}
+   ctx.restore()}
+ }else if(m===4){ // DREHEN: Viertelumdrehungen, Zelle wird passend verkleinert
+  for(let i=0;i<n;i++){const g=GL[i];if(!g)continue;const[k,nx,p]=beatPos(i,u),a=kk=>!rest(kk)&&H(i,kk,6)<A?(H(i,kk,3)*4|0)*Math.PI/2:0,ang=lp(a(k),a(nx),E(p)),c=Math.abs(Math.cos(ang)),sn=Math.abs(Math.sin(ang)),sc=Math.min(cw/(cw*c+h*sn),h/(cw*sn+h*c));
+   ctx.save();ctx.translate(x0+cw*(i+.5),y0+h/2);ctx.rotate(ang);ctx.drawImage(g,-cw*sc/2,-h*sc/2,cw*sc,h*sc);ctx.restore()}
+ }else if(m===5){ // TICKER: Wort in Bändern, jedes Band läuft ganzzahlige Wortbreiten pro Loop
+  const R=Math.max(2,P.slices/2|0),rh=h/R,sh=WC.height/R;
+  ctx.save();ctx.beginPath();ctx.rect(x0,y0,w,h);ctx.clip();
+  for(let r=0;r<R;r++){const dir=r%2?1:-1,mv=H(r,0,4)<A+.15?1:0,bp=beatPos(r,u),o=((((bp[0]%2?(bp[0]>>1)+E(bp[2]):bp[0]>>1)*w*(1+r%3)*mv*dir)%w)+w)%w;
+   ctx.drawImage(WC,0,sh*r,WC.width,sh,x0+o-w,y0+rh*r,w,rh+OV);ctx.drawImage(WC,0,sh*r,WC.width,sh,x0+o,y0+rh*r,w,rh+OV)}
+  ctx.restore();
+ }else if(m===6){ // TUNNEL: Zoom um zwei Ebenen pro Loop -> Anfang = Ende, Farbparität bleibt konsistent
+  const r=1.35+A*1.1,cx=x0+w/2,cy=y0+h/2;
+  for(let j=14;j>=-14;j--){const z=Math.pow(r,j-2*s);if(z*w<3||z>30)continue;const X=cx-w*z/2,Y=cy-h*z/2,ww=w*z,hh=h*z;
+   if(S.im===1&&IMGS.length){const bm=(j&1)?WI:WC;ctx.drawImage(bm,0,0,bm.width,bm.height,X,Y,ww,hh)}else{
+    ctx.fillStyle=(j&1)?ink():paper();ctx.fillRect(X,Y,ww,hh);const cwd=ww/n;
+    for(let i=0;i<n;i++){const gx=X+cwd*i;if(!PRX.mm[i]||gx>W||gx+cwd<0||Y>H_||Y+hh<0)continue;glyphV(i,gx,Y,cwd,hh,(j&1)?paper():letterInk(i))}}}
+ }else if(m===7){ // RADIAL: Ring aus Buchstaben, jeder dreht eine volle Runde pro Loop (versetzt)
+  const R0=Math.min(W,H_)*.28*(1+.25*A*Math.sin(s*T)),lw=T*R0/n*.92,lh=R0*.62;
+  ctx.save();ctx.translate(W/2,H_/2);
+  for(let i=0;i<n;i++){const g=GL[i];if(!g)continue;ctx.save();ctx.rotate(i/n*T+sS(i)*T);ctx.drawImage(g,-lw/2,-R0-lh,lw,lh);ctx.restore()}
+  ctx.restore();
+ }else if(m===8){ // MOSAIK: Kacheln tauschen per Permutation (nach Hash sortiert) von Takt zu Takt die Plätze
+  const cols=Math.max(2,P.slices/2|0),rows=Math.max(2,Math.round(cols*h/w*1.6)),nT=cols*rows,tw=w/cols,th=h/rows,sw=WC.width/cols,sh=WC.height/rows,e=E(p0),nx=(k0+1)%B;
+  const slots=k=>{if(rest(k))return[...Array(nT).keys()];const o=[...Array(nT).keys()].sort((a,b)=>H(a,k,7)-H(b,k,7)),q=new Array(nT);o.forEach((t,r)=>q[t]=r);return q};
+  const a=slots(k0),b=slots(nx),xy=q=>[x0+(q%cols)*tw,y0+(q/cols|0)*th];
+  for(let t=0;t<nT;t++){const[h0,h1]=xy(t),[a0,a1]=xy(a[t]),[b0,b1]=xy(b[t]);
+   ctx.drawImage(WC,(t%cols)*sw,(t/cols|0)*sh,sw,sh,lp(h0,lp(a0,b0,e),A),lp(h1,lp(a1,b1,e),A),tw+OV,th+OV)}
+ }else drawY(m,u)
+}
+function drawY(m,u){
+ const {n,x0,w,y0,h}=L,A=P.amp,B=P.beats,cw=w/n,b0=u*B,bp=i=>beatPos(i,u);
+ if(m===9){ // LAUFWEITE: Buchstaben behalten ihre Breite, nur der Abstand läuft auf und zu
+  const[k,nx,p]=bp(L.i|0),tr=kk=>rest(kk)?1:lp(1,.15+H(L.i|0,kk,1)*2.1,A),t=lp(tr(k),tr(nx),E(p)),gw=cw*.92;
+  for(let i=0;i<n;i++){const g=GL[i];if(g)ctx.drawImage(g,x0+w/2+(i-(n-1)/2)*cw*t-gw/2,y0,gw,h)}
+ }else if(m===10){ // FALLEN: analytische Sprungbahn (Restitution .45), danach Rückflug zum Wort
+  const hh=h*.5,fl=y0+h,D=fl-(y0+hh),t0=.3,gg=2*D/(t0*t0);
+  if(HL()){ctx.globalAlpha=.5;ctx.fillStyle=ink();ctx.fillRect(x0-14,fl+2,w+28,1);ctx.globalAlpha=1}
+  for(let i=0;i<n;i++){const g=GL[i];if(!g)continue;
+   const q=(((u-i*P.stagger*.05)%1)+1)%1,r0=(H(i,0,2)-.5)*1.4*A,cx=x0+cw*(i+.5);let dy=0,ang=0;
+   if(q>=.1&&q<.55){let tau=(q-.1)/.45;if(tau<t0)dy=.5*gg*tau*tau;else{tau-=t0;dy=D;for(let b=1;b<8;b++){const Tb=2*Math.pow(.45,b)*t0;if(tau<Tb){const v=Math.pow(.45,b)*gg*t0;dy=D-(v*tau-.5*gg*tau*tau);break}tau-=Tb}}ang=r0*sm(.1,.2,q)}
+   else if(q>=.55&&q<.75){dy=D;ang=r0}
+   else if(q>=.75&&q<.92){const e=E((q-.75)/.17);dy=D*(1-e);ang=r0*(1-e)}
+   ctx.save();ctx.translate(cx+(H(i,3,2)-.5)*cw*.5*A*dy/D,y0+dy+hh/2);ctx.rotate(ang);ctx.drawImage(g,-cw/2,-hh/2,cw,hh);ctx.restore()}
+ }else if(m===11){ // BOXEN: binäre Raumteilung, Teilverhältnis springt im Takt; Ruhetakt = 1 Box mit dem Wort
+  const[k,nx,p]=bp(0),e=E(p),dep=2+(A*3.5|0),rr=(id,kk)=>rest(kk)?1:.22+.56*H(id,kk,2);
+  const leaf=(x,y,ww,hh,id)=>{if(ww<6||hh<6)return;const bm=id&1?WC:WI;const q=HL()?2:0;ctx.drawImage(bm,0,0,bm.width,bm.height,x+q,y+q,ww-2*q,hh-2*q);if(HL()){ctx.strokeStyle=ink();ctx.lineWidth=1;ctx.strokeRect(x+.5,y+.5,ww-1,hh-1)}};
+  const bsp=(x,y,ww,hh,id,d)=>{if(d===0||ww<24||hh<24)return leaf(x,y,ww,hh,id);const r=lp(rr(id,k),rr(id,nx),e);
+   if(H(id,0,3)<.5){bsp(x,y,ww*r,hh,id*2+1,d-1);bsp(x+ww*r,y,ww*(1-r),hh,id*2+2,d-1)}else{bsp(x,y,ww,hh*r,id*2+1,d-1);bsp(x,y+hh*r,ww,hh*(1-r),id*2+2,d-1)}};
+  bsp(x0,y0,w,h,0,dep);
+ }else if(m===13){ // TRACKWAVE: every letter opens/closes its own spacing, staggered by Offset
+  const gw=cw*.92;for(let i=0;i<n;i++){const g=GL[i];if(!g)continue;const[k,nx,p]=bp(i),tr=kk=>rest(kk)?1:lp(1,.15+H(L.i|0,kk,1)*2.1,A),t=lp(tr(k),tr(nx),E(p));ctx.drawImage(g,x0+w/2+(i-(n-1)/2)*cw*t-gw/2,y0,gw,h)}
+ }else{ // TEXTRASTER: kleine Wörter, Zeilen gleiten um ganze Zellen (rasten im Ruhetakt exakt ein)
+  const C=Math.max(2,B),Rw=Math.max(2,Math.min(8,P.slices/3|0)),cwd=w/C,rh=h/Rw;
+  ctx.save();ctx.beginPath();ctx.rect(x0,y0,w,h);ctx.clip();
+  for(let r=0;r<Rw;r++){const q=bp(r),mv=(1+r%3)*(H(r,0,4)<A+.2?1:0),sh=((q[0]%2?(q[0]>>1)+E(q[2]):q[0]>>1)*cwd*mv*(r%2?1:-1)),o=((sh%w)+w)%w,bm=r%2?WI:WC;
+   for(let c=-1;c<C;c++){const q=HL()?1:0;ctx.drawImage(bm,0,0,bm.width,bm.height,x0+o+c*cwd+q,y0+r*rh+q,cwd-2*q,rh-2*q)}}
+  ctx.restore();
+ }
+}
+const rest=kk=>kk%2===0&&((kk>>1)*.618%1)<=P.ret; // Ruhetakt = Wort
+// Image planes: grid-aligned panels that wipe in, move and swap images on the beat
+const pRect=(j,k)=>{const gc=12,gr=8,cw=2+(H(j,k,21)*5|0),ch=2+(H(j,k,22)*4|0);return[(H(j,k,23)*(gc-cw+1)|0)/gc,(H(j,k,24)*(gr-ch+1)|0)/gr,cw/gc,ch/gr]};
+function drawPlanes(u){
+ if(!IMGS.length)return;
+ const sc=W/Math.max(1,+$('#ew').value||W),px=(+$('#px').value||0)*sc,dl=+$('#pd').value||0,pf=Math.max(1,(+$('#pf').value||1)*sc),x0=W*P.mx/100,y0=H_*P.my/100,w=W-2*x0,h=H_*P.ah/100,A=P.amp,n=Math.max(1,+$('#pc').value|0),T=Math.PI*2;
+ for(let j=0;j<n;j++){
+  const[k,nx,p]=beatPos(j,u),e=E(p),vis=kk=>H(j,kk,25)<A*.8+.2?1:0,s=lp(vis(k),vis(nx),e);if(s<=0)continue;
+  const a=pRect(j,k),b=pRect(j,nx),r=a.map((v,i)=>lp(v,b[i],e)),X=x0+r[0]*w,Y=y0+r[1]*h,Wd=r[2]*w,Hd=r[3]*h,off=H(j,0,27)*IMGS.length|0,iA=IMGS[(j+k+off)%IMGS.length],iB=IMGS[(j+nx+off)%IMGS.length],hz=H(j,0,26)>.5,vw=hz?Wd*s:Wd,vh=hz?Hd:Hd*s,al=cl(Math.min(vw,vh)/pf,0,1);if(al<=0)continue;
+  const ph=T*(u-j*dl),z=1+2*px/Math.max(1,Math.min(Wd,Hd)),pic=(im,g)=>{const q=Math.max(Wd/im.width,Hd/im.height)*z;ctx.globalAlpha=al*g;ctx.drawImage(im,X+(Wd-im.width*q)/2+px*Math.sin(ph),Y+(Hd-im.height*q)/2+px*.5*Math.cos(ph),im.width*q,im.height*q)};
+  ctx.save();ctx.beginPath();ctx.rect(X,Y,vw,vh);ctx.clip();pic(iA,1);if(iB!==iA)pic(iB,sm(0,1,p));ctx.restore()}
+}
+function scene(){
+ const {n,x0,w,y0,h}=L,u=(S.t/P.loop)%1,A=P.amp;drawGrid();
+ if(S.mode===0){ // STRECKEN: Spaltenbreiten und -höhen springen im Takt, Summe bleibt = Rasterbreite
+  const wt=[],ht=[];
+  for(let i=0;i<n;i++){const[k,nx,p]=beatPos(i,u),e=E(p),f=kk=>rest(kk)?1:1+A*(H(i,kk,0)*2.4-1.1);
+   wt.push(Math.max(.12,lp(f(k),f(nx),e)));ht.push(1-A*.85*lp(rest(k)?0:H(i,k,1),rest(nx)?0:H(i,nx,1),e))}
+  const sum=wt.reduce((a,b)=>a+b,0);let cx=x0;
+  for(let i=0;i<n;i++){const cw=wt[i]/sum*w,ch=h*ht[i],y=y0+(h-ch)*(H(i,0,9)>.5?1:0);if(GL[i])ctx.drawImage(GL[i],0,0,GL[i].width,GL[i].height,cx,y,cw,ch);cx+=cw}
+ }else if(S.mode===1){ // SCHNEIDEN: horizontale Streifen verschieben sich zyklisch innerhalb der Zelle
+  const cw=w/n,sn=P.slices;
+  for(let i=0;i<n;i++){const g=GL[i];if(!g)continue;const[k,nx,p]=beatPos(i,u),e=E(p),cx=x0+cw*i;
+   ctx.save();ctx.beginPath();ctx.rect(cx,y0,cw,h);ctx.clip();
+   for(let j=0;j<sn;j++){const off=lp(rest(k)?0:H(i,j,k),rest(nx)?0:H(i,j,nx),e)*A*cw*2,o=((off%cw)+cw)%cw,sy=g.height/sn,dy=y0+h/sn*j;
+    ctx.drawImage(g,0,sy*j,g.width,sy,cx+o,dy,cw,h/sn+OV);ctx.drawImage(g,0,sy*j,g.width,sy,cx+o-cw,dy,cw,h/sn+OV)}
+   ctx.restore()}
+ }else if(S.mode===2){ // KOLLABIEREN: gestuftes Zusammenfallen zur Grundlinie, Wiederaufbau von oben
+  const cw=w/n;
+  for(let i=0;i<n;i++){const g=GL[i];if(!g)continue;const[,,p,q]=beatPos(i,u),B=P.beats,s=(Math.floor(q*B)+E(p))/B,c=1-Math.abs(2*s-1);
+   const ch=Math.max(1,h*(1-c*A*.97)),y=q<.5?y0+h-ch:y0;ctx.drawImage(g,0,0,g.width,g.height,x0+cw*i,y,cw,ch)}
+ }else drawX(S.mode,u);
+}
+function draw(cT=S.t%P.loop,cD=P.loop){
+ const u=(S.t/P.loop)%1;
+ ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle=paper();ctx.fillRect(0,0,W,H_);
+ OV=$('#sp').checked?0:.6;if(S.im===1&&IMGS.length&&(+$('#px').value||0)>0)buildGlyphs();if(S.im===3&&IO())drawPlanes(u);
+ for(const ln of LINES){({L,GL,GI,WC,WI,CH,PRX}=ln);scene()}
+ if(S.im===2&&IO())drawPlanes(u);
+ const fd=+P.fade;if(fd>0){const fa=Math.min(1,Math.max(1-cT/fd,1-(cD-cT)/fd,0));if(fa>0){ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=fa;ctx.fillStyle=paper();ctx.fillRect(0,0,cv.width,cv.height);ctx.globalAlpha=1}}
+ $('#fill').style.left=u*100+'%';
+ $('#ro').textContent=`${MODES[S.mode]}   t ${(S.t%P.loop).toFixed(2)} / ${(+P.loop).toFixed(1)} s   seed ${S.seed}`;
+}
+let last=0,fr=0;
+function frame(now){
+ requestAnimationFrame(frame);
+ if(S.exp)return;
+ try{const dt=Math.min(.05,(now-last)/1000||0);last=now;if(RE.on&&RE.clips.length){if(S.play)RE.rt=(RE.rt+dt)%RE.len;const q=seekReel(RE.rt);draw(q.cT,q.cD);return}
+  if(S.play)S.t+=dt*P.speed;
+  if(++fr%30===0&&readTheme())rebuild();draw()}catch(e){err(e)}
+}
+function setMode(m){S.mode=m;$('#md').value=m;$('#ds').textContent=DESC[m]}
+const loadF=()=>{try{document.fonts.load(`${FONTS[F][1]} 200px '${FONTS[F][0]}'`).then(rebuild,rebuild)}catch(e){rebuild()}};
+function sync(){for(const k in inp){inp[k].i.value=P[k];inp[k].o.value=fm(P[k],inp[k].st)}$('#sd').value=S.seed;setMode(S.mode);ticks();$('#fn').value=F}
+const ticks=()=>{$('#bar').style.background=`repeating-linear-gradient(90deg,var(--line) 0 1px,transparent 1px ${100/P.beats}%)`};
+function buildUI(){
+ MODES.forEach((m,i)=>$('#md').add(new Option(m,i)));$('#md').onchange=e=>setMode(+e.target.value);
+ FONTS.forEach((f,i)=>$('#fn').add(new Option(f[0],i)));$('#fn').onchange=e=>{F=+e.target.value;loadF()};
+ DEF.forEach(([k,l,mn,mx,st,df])=>{P[k]=df;const r=document.createElement('label');r.className='row';
+  r.innerHTML=`<span>${l}</span><input type="range" min="${mn}" max="${mx}" step="${st}" value="${df}"><input type="number" class="nb" step="${st}" value="${df}">`;
+  const[i,o]=r.querySelectorAll('input');inp[k]={i,o,st};const ap=v=>{if(v===''||isNaN(v))return;P[k]=k==='beats'||k==='slices'?Math.max(1,Math.round(+v)):+v;if(k==='beats')ticks();if(k==='mx'||k==='my'||k==='ah')rebuild()};
+  i.oninput=()=>{o.value=fm(i.value,st);ap(i.value)};o.oninput=()=>{i.value=o.value;ap(o.value)};$('#sl2').append(r)});
+}
+function randomize(){
+ if(!$('#sl').checked)S.seed=(Date.now()*2654435761>>>0)%99999;
+ const R=rng(S.seed^0x51ed);
+ P.beats=2+(R()*9|0);P.amp=Math.round((.45+R()*.55)*100)/100;P.slices=4+(R()*30|0);P.stagger=Math.round(R()*80)/100;
+ if(!$('#ml').checked)S.mode=R()*MODES.length|0;
+ sync();
+}
+// ---- MP4-Export: Bild für Bild offline gerendert (WebCodecs H.264 + mp4-muxer), exakt in Auflösung und fps ----
+const RES=[[1280,720],[1920,1080],[1080,1080],[1080,1350],[1080,1920],[3840,2160]];
+RES.forEach((r,i)=>$('#rs').add(new Option(`Preset ${r[0]}×${r[1]}`,i)));$('#rs').value=1;
+link($('#du'),$('#duo'));const pr=()=>{const r=RES[+$('#rs').value];$('#ew').value=r[0];$('#eh').value=r[1]};$('#rs').onchange=()=>{pr();rebuild()};pr();$('#ew').oninput=$('#eh').oninput=rebuild;
+let DL=null;(async()=>{try{DL=await window.claude.use('downloads')}catch(e){}})();
+const xs=t=>$('#xs').textContent=t,tick=()=>new Promise(r=>setTimeout(r,0));
+async function exportMp4(){
+ if(S.exp)return;
+ if(!window.VideoEncoder||!window.Mp4Muxer){xs('This browser cannot encode MP4 (WebCodecs or the muxer script is missing). Use current Chrome, Edge or Safari with internet access.');return}
+ const [rw,rh]=[+$('#ew').value,+$('#eh').value].map(v=>cl(v|0,16,7680)&~1),fps=cl(+$('#fps').value||30,1,120),rl=RE.on&&RE.clips.length>0,D=rl?RE.len:(+$('#duo').value||4),N=Math.max(1,Math.round(D*fps)),spd=+P.speed,saveT=S.t,wasPlay=S.play,btn=$('#ex');
+ S.exp=true;S.play=false;btn.disabled=true;let enc=null,fb=false;
+ try{
+  let cfg=null,mc='avc';
+  const br=Math.round((+$('#br').value||40)*1e6);
+  for(const[codec,m]of [['avc1.640034','avc'],['avc1.640033','avc'],['avc1.64002a','avc'],['avc1.4d002a','avc'],['avc1.42002a','avc'],['avc1.42001f','avc'],['vp09.00.51.08','vp9'],['vp09.00.40.08','vp9'],['av01.0.12M.08','av1']]){const c={codec,width:rw,height:rh,bitrate:br,framerate:fps,latencyMode:'quality'};if(m==='avc')c.avc={format:'avc'};try{if((await VideoEncoder.isConfigSupported(c)).supported){cfg=c;mc=m;break}}catch(_){}}
+  if(!cfg)throw new Error('No H.264 encoder for this size. Choose a smaller resolution or lower fps.');
+  const muxer=new Mp4Muxer.Muxer({target:new Mp4Muxer.ArrayBufferTarget(),video:{codec:mc,width:rw,height:rh},fastStart:'in-memory'});
+  let encErr=null;let seen=false;enc=new VideoEncoder({output:(c,m)=>{if(encErr)return;if(!seen){seen=true;if(!(m&&m.decoderConfig)){encErr=new Error('Encoder returned no decoder config');return}}try{muxer.addVideoChunk(c,m)}catch(x){encErr=x}},error:e=>{encErr=e}});enc.configure(cfg);
+  if(rl)RE.cur=-1;XO=[rw,rh];rebuild();
+  for(let f=0;f<N;f++){
+   if(encErr)throw encErr;
+   const tc=f/fps;if(rl){const q=seekReel(tc);draw(q.cT,q.cD)}else{S.t=tc*spd;draw(tc,D)} // Zeit ist reine Funktion des Frames -> identisch zur Vorschau
+   const vf=new VideoFrame(cv,{timestamp:Math.round(f*1e6/fps),duration:Math.round(1e6/fps)});
+   enc.encode(vf,{keyFrame:f%(fps*2)===0});vf.close();
+   while(enc.encodeQueueSize>6)await tick();
+   if(f%4===0){xs(`Rendering ${f+1} / ${N} (${rw}×${rh}, ${fps} fps)`);await tick()}
+  }
+  await enc.flush();if(encErr)throw encErr;muxer.finalize();
+  xs('Done. Saving …');
+  const blob=new Blob([muxer.target.buffer],{type:'video/mp4'}),fn=`simple-motion-${MODES[S.mode].toLowerCase()}-${S.seed}.mp4`;
+  if(DL)await DL.save({filename:fn,data:blob});else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000)}
+  xs('Saved.');
+ }catch(e){if(e&&e.code==='declined')xs('Save cancelled.');else{fb=true;console.error(e)}}
+ finally{try{if(enc&&enc.state!=='closed')enc.close()}catch(_){}XO=null;RE.cur=-1;S.exp=false;S.play=wasPlay;S.t=saveT;btn.disabled=false;rebuild()}
+ if(fb){xs('MP4 encoder failed in this browser – recording in real time instead …');await exportRec()}
+}
+// Image sequence: every frame rendered offline at the chosen size, packed into one store-only ZIP
+const crcT=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+const crc=u=>{let c=-1;for(let i=0;i<u.length;i++)c=crcT[(c^u[i])&255]^(c>>>8);return(~c)>>>0};
+function zip(files){
+ const en=new TextEncoder(),parts=[],cd=[];let off=0,cs=0;
+ for(const[n,d]of files){const nb=en.encode(n),c=crc(d),h=new DataView(new ArrayBuffer(30));
+  h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x0800,true);h.setUint32(14,c,true);h.setUint32(18,d.length,true);h.setUint32(22,d.length,true);h.setUint16(26,nb.length,true);
+  parts.push(h.buffer,nb,d);
+  const e=new DataView(new ArrayBuffer(46));e.setUint32(0,0x02014b50,true);e.setUint16(4,20,true);e.setUint16(6,20,true);e.setUint16(8,0x0800,true);e.setUint32(16,c,true);e.setUint32(20,d.length,true);e.setUint32(24,d.length,true);e.setUint16(28,nb.length,true);e.setUint32(42,off,true);
+  cd.push(e.buffer,nb);off+=30+nb.length+d.length;cs+=46+nb.length}
+ const z=new DataView(new ArrayBuffer(22));z.setUint32(0,0x06054b50,true);z.setUint16(8,files.length,true);z.setUint16(10,files.length,true);z.setUint32(12,cs,true);z.setUint32(16,off,true);
+ return new Blob([...parts,...cd,z.buffer],{type:'application/zip'})}
+async function exportSeq(ty){
+ if(S.exp)return;
+ const [rw,rh]=[+$('#ew').value,+$('#eh').value].map(v=>cl(v|0,16,7680)&~1),fps=cl(+$('#fps').value||30,1,120),rl=RE.on&&RE.clips.length>0,D=rl?RE.len:(+$('#duo').value||4),N=Math.max(1,Math.round(D*fps)),spd=+P.speed,saveT=S.t,wasPlay=S.play,btn=$('#ex'),mime=ty==='jpg'?'image/jpeg':'image/png',files=[];
+ S.exp=true;S.play=false;btn.disabled=true;
+ try{
+  if(rl)RE.cur=-1;XO=[rw,rh];rebuild();
+  for(let f=0;f<N;f++){const tc=f/fps;if(rl){const q=seekReel(tc);draw(q.cT,q.cD)}else{S.t=tc*spd;draw(tc,D)}
+   const b=await new Promise(r=>cv.toBlob(r,mime,.95));if(!b)throw new Error('Could not encode frame '+(f+1)+' (size too large?)');
+   files.push([`frame_${String(f+1).padStart(5,'0')}.${ty}`,new Uint8Array(await b.arrayBuffer())]);
+   if(f%4===0){xs(`Rendering ${f+1} / ${N} (${rw}×${rh}, ${ty.toUpperCase()})`);await tick()}}
+  xs('Packing ZIP …');await tick();
+  const blob=zip(files),fn=`simple-motion-${MODES[S.mode].toLowerCase()}-${S.seed}-${ty}-${fps}fps.zip`;
+  if(DL)await DL.save({filename:fn,data:blob});else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000)}
+  xs(`Saved ${fn} (${N} frames)`)
+ }catch(e){xs(e&&e.code==='declined'?'Save cancelled.':'Export failed: '+(e&&e.message||e))}
+ finally{XO=null;RE.cur=-1;S.exp=false;S.play=wasPlay;S.t=saveT;btn.disabled=false;rebuild()}
+}
+// Fallback: real-time recording (MediaRecorder) -> MP4 where supported, otherwise WebM
+async function exportRec(){
+ if(S.exp)return;
+ if(!window.MediaRecorder||!cv.captureStream){xs('Export is not supported in this browser. Use current Chrome, Edge or Safari.');return}
+ const [rw,rh]=[+$('#ew').value,+$('#eh').value].map(v=>cl(v|0,16,7680)&~1),fps=cl(+$('#fps').value||30,1,120),rl=RE.on&&RE.clips.length>0,D=rl?RE.len:(+$('#duo').value||4),N=Math.max(2,Math.round(D*fps)),spd=+P.speed,saveT=S.t,wasPlay=S.play,btn=$('#ex');
+ const mt=['video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t=>MediaRecorder.isTypeSupported(t))||'video/webm',wt=t=>new Promise(r=>setTimeout(r,Math.max(0,t-performance.now())));
+ S.exp=true;S.play=false;btn.disabled=true;
+ try{
+  if(rl)RE.cur=-1;XO=[rw,rh];rebuild();
+  const st=cv.captureStream(fps),tr=st.getVideoTracks()[0],ch=[],rec=new MediaRecorder(st,{mimeType:mt,videoBitsPerSecond:Math.round((+$('#br').value||40)*1e6)});
+  rec.ondataavailable=e=>{if(e.data.size)ch.push(e.data)};const end=new Promise(r=>rec.onstop=r);
+  const put=f=>{const tc=f/fps;if(rl){const q=seekReel(tc);draw(q.cT,q.cD)}else{S.t=tc*spd;draw(tc,D)}void tr};
+  put(0);rec.start();const t0=performance.now();
+  for(let f=1;f<N;f++){xs(`Recording ${f} / ${N} in real time – keep this tab in the foreground`);await wt(t0+f*1000/fps);put(f)}
+  await wt(t0+N*1000/fps);rec.stop();await end;
+  const blob=new Blob(ch,{type:mt.split(';')[0]}),ext='mp4',real=mt.includes('mp4'),fn=`simple-motion-${MODES[S.mode].toLowerCase()}-${S.seed}.${ext}`;
+  if(DL)await DL.save({filename:fn,data:blob});else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000)}
+  xs('Saved '+fn+(real?'':' – note: this browser records WebM data; the file is named .mp4 as requested, use the PNG sequence + ffmpeg if a player refuses it'))
+ }catch(e){xs(e&&e.code==='declined'?'Save cancelled.':'Export failed: '+(e&&e.message||e))}
+ finally{XO=null;RE.cur=-1;S.exp=false;S.play=wasPlay;S.t=saveT;btn.disabled=false;rebuild()}
+}
+// ---- Reel: zufällige Setups mit harten Schnitten, einzeln wählbar und neu würfelbar ----
+const RG=rng(Date.now()>>>0);
+const snap=()=>({cs:S.cs,...IMV(),line:S.line,mode:S.mode,seed:S.seed,font:F,inv:$('#iv').checked,p:{beats:P.beats,amp:P.amp,slices:P.slices,stagger:P.stagger,speed:P.speed,ret:P.ret},dur:1});
+function applyClip(c){S.cs=c.cs|0;setIMV(c);S.line=c.line|0;S.mode=c.mode;S.seed=c.seed;F=c.font;$('#iv').checked=c.inv;Object.assign(P,c.p);sync()}
+const commit=()=>{const c=RE.clips[RE.sel];if(c)RE.clips[RE.sel]={...snap(),dur:c.dur}};
+function genClip(avoid){const r=RG;let m;do{m=r()*MODES.length|0}while(m===avoid);
+ return{cs:$('#cr').checked?(r()*99998|0)+1:0,...IMV(),im:IMGS.length?[0,1,2,2,3][r()*5|0]:0,mode:m,seed:r()*99999|0,font:$('#rf').checked?F:r()*FONTS.length|0,inv:r()<.3,dur:1,p:{beats:2+(r()*7|0),amp:Math.round((.5+r()*.5)*100)/100,slices:6+(r()*24|0),stagger:Math.round(r()*70)/100,speed:Math.round((.8+r()*.9)*20)/20,ret:1}}}
+function layout(){let a=0;RE.starts=RE.clips.map(c=>{const t=a;a+=c.dur;return t});RE.len=a}
+function chips(){const c0=RE.clips[RE.sel];if(c0&&document.activeElement.id!=='sdu')$('#sdu').value=c0.dur.toFixed(2);const b=$('#chips');b.textContent='';RE.clips.forEach((c,i)=>{const e=document.createElement('button');e.textContent=`${i+1} ${MODES[c.mode]} ${c.dur.toFixed(1)}s${IMGS.length&&c.im>0?' · img'+c.im:''}`;e.setAttribute('aria-pressed',i===RE.sel);e.onclick=()=>pick(i);b.append(e)})}
+function pick(i){commit();RE.on=false;$('#rm').checked=false;RE.sel=i;applyClip(RE.clips[i]);rebuild();S.t=0;chips()}
+function seekReel(tc){
+ let i=RE.starts.findIndex((t,j)=>tc>=t&&tc<t+RE.clips[j].dur);if(i<0)i=RE.clips.length-1;
+ if(i!==RE.cur){RE.cur=i;RE.sel=i;applyClip(RE.clips[i]);rebuild();chips()}
+ const c=RE.clips[i];S.t=(tc-RE.starts[i])*c.p.speed;return{cT:tc-RE.starts[i],cD:c.dur}
+}
+async function makeReel(){
+ const n=Math.max(1,+$('#rno').value|0),L0=Math.max(1,+$('#rlo').value||12);xs('Loading fonts …');
+ try{await Promise.all(FONTS.map(f=>document.fonts.load(`${f[1]} 100px '${f[0]}'`)))}catch(e){}
+ const ws=[...Array(n)].map(()=>.6+RG()),sum=ws.reduce((a,b)=>a+b,0);let prev=-1;
+ RE.clips=ws.map(wt=>{const c=genClip(prev);prev=c.mode;c.dur=Math.max(.4,wt/sum*L0);return c});
+ RE.clips.forEach((c,i)=>c.line=i);layout();RE.sel=0;RE.cur=-1;RE.rt=0;applyClip(RE.clips[0]);rebuild();S.t=0;chips();xs('Reel with '+n+' setups created. Click a setup to edit it.');
+}
+$('#rg').onclick=makeReel;$('#sdu').oninput=()=>{const c=RE.clips[RE.sel],v=+$('#sdu').value;if(c&&v>0){c.dur=v;layout();chips()}};
+$('#rr').onclick=()=>{if(!RE.clips.length)return;const c=genClip(-1);c.dur=RE.clips[RE.sel].dur;c.line=RE.clips[RE.sel].line;RE.clips[RE.sel]=c;applyClip(c);rebuild();S.t=0;chips()};
+$('#rm').onchange=e=>{if(e.target.checked){commit();RE.on=RE.clips.length>0;RE.cur=-1;RE.rt=0;e.target.checked=RE.on}else RE.on=false};
+link($('#rn'),$('#rno'));link($('#rl'),$('#rlo'));
+$('#ex').onclick=()=>{const v=$('#ef').value;v==='mp4'?exportMp4():exportSeq(v)};
+$('#rnd').onclick=randomize;
+$('#sd').onchange=e=>{S.seed=cl(+e.target.value|0,0,99999)};
+let tm;const readTx=()=>{const t=$('#tx'),raw=t.value.split('\n').map(x=>x.slice(0,100)).slice(0,12).join('\n');if(raw!==t.value)t.value=raw;S.lines=raw.split('\n').map(x=>x.trim()).filter(Boolean);if(!S.lines.length)S.lines=[' ']};
+$('#tx').oninput=()=>{readTx();clearTimeout(tm);tm=setTimeout(rebuild,100)};
+$('#vc').onchange=rebuild;$('#rp').oninput=rebuild;
+$('#tm').onchange=e=>{S.tm=+e.target.value;rebuild()};
+$('#im').onchange=async e=>{for(const f of e.target.files)await new Promise(r=>{const i=new Image();i.onload=()=>{IMGS.push(i);r()};i.onerror=r;i.src=URL.createObjectURL(f)});if(IMGS.length&&!S.im){S.im=2;$('#imm').value=2}$('#imc').textContent=IMGS.length+' image(s) loaded';rebuild()};
+$('#imm').onchange=e=>{S.im=+e.target.value;rebuild();if(RE.clips.length){commit();chips()}};
+$('#imx').onclick=()=>{IMGS=[];S.im=0;$('#imm').value=0;$('#im').value='';$('#imc').textContent='';rebuild()};
+$('#cz').onclick=()=>{S.cs=(Math.random()*99998|0)+1;if(!PL.on){PL.on=true;$('#cu').checked=true}rebuild()};
+function buildColors(){const b=$('#cs');b.textContent='';for(let i=0;i<PL.n;i++){const r=document.createElement('label');r.className='sys';r.innerHTML=`<input type="color" value="${PL.c[i]}"><span>${i?i===1?'Type':'Accent '+(i-1):'Background'}</span>`;const c=r.querySelector('input');c.oninput=()=>{PL.c[i]=c.value;PL.on=true;$('#cu').checked=true;rebuild()};b.append(r)}}
+$('#cu').onchange=e=>{PL.on=e.target.checked;rebuild()};
+link($('#cn'),$('#cno'),()=>{PL.n=cl(Math.round(+$('#cno').value)||2,2,8);buildColors();rebuild()});buildColors();
+const tabs=[...document.querySelectorAll('#tabs button')];tabs.forEach(b=>b.onclick=()=>{tabs.forEach(x=>x.setAttribute('aria-pressed',x===b));document.querySelectorAll('aside section').forEach(z=>z.hidden=z.dataset.k!==b.dataset.k)});
+$('#iv').onchange=rebuild;$('#pp').onchange=rebuild;['pc','pf','px','pd','fm'].forEach(id=>$('#'+id).oninput=()=>{rebuild();if(RE.clips.length){commit();chips()}});
+$('#pl').onclick=()=>{S.play=!S.play;$('#pl').textContent=S.play?'Pause':'Play'};
+addEventListener('keydown',e=>{if(e.code==='Space'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){e.preventDefault();$('#pl').click()}});
+const bar=$('#bar');let drag=false;
+const scrub=e=>{const b=bar.getBoundingClientRect();S.t=cl((e.clientX-b.left)/b.width,0,.999)*P.loop};
+bar.onpointerdown=e=>{drag=true;bar.setPointerCapture(e.pointerId);scrub(e)};bar.onpointermove=e=>{if(drag)scrub(e)};bar.onpointerup=()=>drag=false;
+let rs;new ResizeObserver(()=>{clearTimeout(rs);rs=setTimeout(rebuild,80)}).observe($('#stage'));
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',rebuild);
+buildUI();sync();if(!S.play){S.t=1.2;$('#pl').textContent='Play'}rebuild();
+loadF();
+requestAnimationFrame(frame);
+</script>
+
+
+</body></html>
